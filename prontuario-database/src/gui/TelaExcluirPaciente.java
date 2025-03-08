@@ -40,9 +40,9 @@ public class TelaExcluirPaciente extends JDialog {
 		this.pacService = pacService;
 		this.main = main;
 		
-		setSize(720,480);
+		setSize(580, 200);
 		setResizable(false);
-		setTitle("Tela de Atualização de Paciente");
+		setTitle("Tela de Exclusão de Paciente");
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
 		
@@ -92,6 +92,8 @@ public class TelaExcluirPaciente extends JDialog {
 		painelBotoes.add(btnLimpar);
 		painelBotoes.add(btnSair);
 		add(painelBotoes, BorderLayout.SOUTH);
+		
+		setLocationRelativeTo(main);
 		setModal(true);
 		setVisible(true);
 		
@@ -138,7 +140,7 @@ public class TelaExcluirPaciente extends JDialog {
         pacienteAtual.setNome(novoNome);
         
         pacService.deletarPaciente(pacienteAtual);
-        main.atualizarTabela();
+        main.atualizarTabelaPacientes();
         fecharTela();
         
 	}

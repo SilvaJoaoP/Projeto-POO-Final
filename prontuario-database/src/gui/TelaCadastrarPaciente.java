@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -14,89 +15,99 @@ import service.PacienteService;
 
 public class TelaCadastrarPaciente extends JDialog{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private PacienteService pacService;
-	private TelaPrincipal main;
-	private JPanel painelForm;
-	private JPanel painelBotoes;
-	private JButton btnSalvar;
-	private JButton btnLimpar;
-	private JButton btnSair;
-	private JLabel lblNome;
-	private JLabel lblCpf;
-	private JTextField txfNome;
-	private JTextField txfCpf;
-	
-	
-	
-	public TelaCadastrarPaciente(PacienteService pacService, TelaPrincipal main) {
-		this.pacService = pacService;
-		this.main = main;
-		setSize(360,200);
-		setResizable(false);
-		setTitle("Tela de Cadastro de Paciente");
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setLayout(new BorderLayout());
-		
-		//-----------------------------
-		
-		painelForm = new JPanel();
-		lblNome = new JLabel("Nome: ");
-		lblCpf = new JLabel("CPF: ");
-		txfNome = new JTextField(24);
-		txfCpf = new JTextField(24);
-		
-		painelForm.add(lblNome);
-		painelForm.add(txfNome);
-		painelForm.add(lblCpf);
-		painelForm.add(txfCpf);
-		
-		add(painelForm, BorderLayout.CENTER);
-		
-		//------------------------------
-		
-		painelBotoes = new JPanel();
-		btnSair = new JButton("Sair");
-		btnLimpar = new JButton("Limpar");
-		btnSalvar = new JButton("Salvar");
-		
-		
-		btnSair.addActionListener(e -> fecharTela());
-		btnLimpar.addActionListener(e -> limparCampos());
-		btnSalvar.addActionListener(e -> addPaciente());
-		
-		painelBotoes.add(btnSalvar);
-		painelBotoes.add(btnLimpar);
-		painelBotoes.add(btnSair);
-		add(painelBotoes, BorderLayout.SOUTH);
-		
-		setModal(true);
-		setVisible(true);
-	}
-	
-	private void fecharTela() {
-		this.hide();
-	}
-	
-	private void addPaciente() {
-		Paciente p = new Paciente(0L, txfCpf.getText(), txfNome.getText());
-		pacService.adicionarPaciente(p);
-		JOptionPane.showMessageDialog(null, "Paciente cadastrado com sucesso");
-		txfCpf.setText("");
-		txfNome.setText("");
-		main.loadTablePaciente();
-		fecharTela();
-	}
-	
-	private void limparCampos() {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
+    private PacienteService pacService;
+    private TelaPrincipal main;
+    private JPanel painelForm;
+    private JPanel painelBotoes;
+    private JButton btnSalvar;
+    private JButton btnLimpar;
+    private JButton btnSair;
+    private JLabel lblNome;
+    private JLabel lblCpf;
+    private JTextField txfNome;
+    private JTextField txfCpf;
+    
+    
+    
+    public TelaCadastrarPaciente(PacienteService pacService, TelaPrincipal main) {
+        this.pacService = pacService;
+        this.main = main;
+        setSize(380, 200);
+        setResizable(false);
+        setTitle("Tela de Cadastro de Paciente");
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        //-----------------------------
+        
+        painelForm = new JPanel(new GridLayout(2, 1, 5, 5)); 
+        
+        // Painel para Nome
+        JPanel painelNome = new JPanel();
+        lblNome = new JLabel("Nome: ");
+        txfNome = new JTextField(24); 
+        painelNome.add(lblNome);
+        painelNome.add(txfNome);
+        
+        // Painel para CPF
+        JPanel painelCpf = new JPanel();
+        lblCpf = new JLabel("CPF: ");
+        txfCpf = new JTextField(24); 
+        painelCpf.add(lblCpf);
+        painelCpf.add(txfCpf);
+        
+
+        painelForm.add(painelNome);
+        painelForm.add(painelCpf);
+        
+        add(painelForm, BorderLayout.CENTER);
+        
+        //------------------------------
+        
+        painelBotoes = new JPanel();
+        btnSair = new JButton("Sair");
+        btnLimpar = new JButton("Limpar");
+        btnSalvar = new JButton("Salvar");
+        
+        
+        btnSair.addActionListener(e -> fecharTela());
+        btnLimpar.addActionListener(e -> limparCampos());
+        btnSalvar.addActionListener(e -> addPaciente());
+        
+        painelBotoes.add(btnSalvar);
+        painelBotoes.add(btnLimpar);
+        painelBotoes.add(btnSair);
+        add(painelBotoes, BorderLayout.SOUTH);
+        
+        setModal(true);
+        setLocationRelativeTo(main);
+        setVisible(true);
+    }
+    
+    private void addPaciente() {
+        Paciente p = new Paciente(0L, txfCpf.getText(), txfNome.getText());
+        pacService.adicionarPaciente(p);
+        JOptionPane.showMessageDialog(null, "Paciente cadastrado com sucesso");
+        txfCpf.setText("");
+        txfNome.setText("");
+        main.loadTablePaciente();
+        fecharTela();
+    }
+    
+    private void limparCampos() {
         txfCpf.setText("");
         txfNome.setText("");
         txfCpf.setEnabled(true);
         btnSalvar.setEnabled(false);
     }
-	
+    
+    private void fecharTela() {
+        this.hide();
+    }
+    
 }

@@ -76,8 +76,4 @@ public class Paciente {
 		return "Paciente [id=" + id + ", cpf=" + cpf + ", nome=" + nome + ", exames=" + exames + "]";
 	}
 	
-	
-	
-	
-	
 }

@@ -1,7 +1,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -40,7 +39,7 @@ public class TelaAtualizarPaciente extends JDialog {
 	public TelaAtualizarPaciente(PacienteService pacService, TelaPrincipal main) {
 		this.pacService = pacService;
 		this.main = main;
-		setSize(720,480);
+		setSize(520,200);
 		setResizable(false);
 		setTitle("Tela de Atualização de Paciente");
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -92,6 +91,8 @@ public class TelaAtualizarPaciente extends JDialog {
 		painelBotoes.add(btnLimpar);
 		painelBotoes.add(btnSair);
 		add(painelBotoes, BorderLayout.SOUTH);
+		
+		setLocationRelativeTo(main);
 		setModal(true);
 		setVisible(true);
 
@@ -145,7 +146,8 @@ public class TelaAtualizarPaciente extends JDialog {
         pacienteAtual.setNome(novoNome);
         
         pacService.atualizarPaciente(pacienteAtual);
-        main.atualizarTabela();
+        main.atualizarTabelaPacientes();
+        main.atualizarTabelaExames();
         fecharTela();
         
 	}

@@ -2,7 +2,7 @@ package service;
 
 import java.util.List;
 
-import dao.GenericDAO;
+
 import dao.PacienteDAO;
 import model.Paciente;
 
