@@ -17,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 
+import exception.CampoObrigatorioException;
+import exception.ExameNaoEncontradoException;
+import exception.FormatoInvalidoException;
 import model.Exame;
 import model.Paciente;
 import service.ExameService;
@@ -157,20 +160,16 @@ public class TelaAtualizarExame extends JDialog {
     }
     
     private void buscarExame() {
-        String idPesquisa = txfPesquisaId.getText().trim();
-        if (idPesquisa.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o ID do exame para busca", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         try {
-            Long id = Long.parseLong(idPesquisa);
-            exameAtual = exameService.localizarExamePorId(id);
-            
-            if (exameAtual != null) {
+            String idPesquisa = txfPesquisaId.getText().trim();
+            if (idPesquisa.isEmpty()) {
+                throw new CampoObrigatorioException("ID do exame");
+            }
+
+            try {
+                Long id = Long.parseLong(idPesquisa);
+                exameAtual = exameService.localizarExamePorId(id);
+                
                 txfDescricao.setText(exameAtual.getDescricao());
                 txfDataExame.setText(exameAtual.getDataExame());
                 
@@ -183,66 +182,74 @@ public class TelaAtualizarExame extends JDialog {
                 }
                 
                 btnSalvar.setEnabled(true);
-            } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Exame não encontrado com o ID informado", 
-                    "Aviso", 
-                    JOptionPane.WARNING_MESSAGE);
-                limparCampos();
+            } catch (NumberFormatException e) {
+                throw new FormatoInvalidoException("ID do exame", "número inteiro");
             }
-        } catch (NumberFormatException e) {
+        } catch (CampoObrigatorioException e) {
             JOptionPane.showMessageDialog(this, 
-                "Por favor, informe um ID válido (número inteiro)", 
+                e.getMessage(), 
+                "Campo obrigatório", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (FormatoInvalidoException e) {
+            JOptionPane.showMessageDialog(this, 
+                e.getMessage(), 
+                "Formato inválido", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (ExameNaoEncontradoException e) {
+            JOptionPane.showMessageDialog(this, 
+                e.getMessage(), 
+                "Exame não encontrado", 
+                JOptionPane.WARNING_MESSAGE);
+            limparCampos();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Erro ao buscar exame: " + e.getMessage(), 
                 "Erro", 
                 JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
     
     private void salvarAlteracoes() {
-        if (exameAtual == null) {
-            JOptionPane.showMessageDialog(this, 
-                "Primeiro busque um exame para atualizar", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        try {
+            if (exameAtual == null) {
+                JOptionPane.showMessageDialog(this, 
+                    "Primeiro busque um exame para atualizar", 
+                    "Erro", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        String novaDescricao = txfDescricao.getText().trim();
-        String novaData = txfDataExame.getText().trim();
-        Paciente novoPaciente = (Paciente) cmbPaciente.getSelectedItem();
-        
-        if (novaDescricao.isEmpty()) {
+            exameAtual.setDescricao(txfDescricao.getText().trim());
+            exameAtual.setDataExame(txfDataExame.getText().trim());
+            exameAtual.setPaciente((Paciente) cmbPaciente.getSelectedItem());
+            
+            exameService.atualizarExame(exameAtual);
+            JOptionPane.showMessageDialog(this, "Exame atualizado com sucesso!");
+            main.atualizarTabelaExames();
+            fecharTela();
+        } catch (CampoObrigatorioException e) {
             JOptionPane.showMessageDialog(this, 
-                "A descrição não pode estar vazia", 
+                e.getMessage(), 
+                "Campo obrigatório", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (FormatoInvalidoException e) {
+            JOptionPane.showMessageDialog(this, 
+                e.getMessage(), 
+                "Formato inválido", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (ExameNaoEncontradoException e) {
+            JOptionPane.showMessageDialog(this, 
+                e.getMessage(), 
+                "Exame não encontrado", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Erro ao atualizar exame: " + e.getMessage(), 
                 "Erro", 
                 JOptionPane.ERROR_MESSAGE);
-            return;
+            e.printStackTrace();
         }
-        
-        if (novaData.contains("_") || novaData.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe uma data válida no formato dd/mm/aaaa", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        if (novoPaciente == null) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, selecione um paciente", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        exameAtual.setDescricao(novaDescricao);
-        exameAtual.setDataExame(novaData);
-        exameAtual.setPaciente(novoPaciente);
-        
-        exameService.atualizarExame(exameAtual);
-        JOptionPane.showMessageDialog(this, "Exame atualizado com sucesso!");
-        main.atualizarTabelaExames();
-        fecharTela();
     }
     
     private void limparCampos() {
@@ -256,6 +263,6 @@ public class TelaAtualizarExame extends JDialog {
     }
     
     private void fecharTela() {
-        this.hide();
+        this.hide(); 
     }
 }

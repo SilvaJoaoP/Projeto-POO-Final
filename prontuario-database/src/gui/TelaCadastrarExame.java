@@ -19,6 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.MaskFormatter;
 
+import exception.CampoObrigatorioException;
+import exception.FormatoInvalidoException;
 import model.Exame;
 import model.Paciente;
 import service.ExameService;
@@ -150,39 +152,32 @@ public class TelaCadastrarExame extends JDialog {
     }
     
     private void addExame() {
-        if (txfDescricao.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, preencha a descrição do exame.", 
-                    "Campo obrigatório", JOptionPane.WARNING_MESSAGE);
-            return;
+        try {
+            Exame e = new Exame();
+            e.setId(0L);
+            e.setDescricao(txfDescricao.getText());
+            e.setDataExame(txfDataExame.getText().trim());
+            e.setPaciente((Paciente) cmbPaciente.getSelectedItem());
+            
+            exameService.adicionarExame(e);
+            
+            JOptionPane.showMessageDialog(this, "Exame cadastrado com sucesso");
+            
+            main.loadTableExame();
+            
+            fecharTela();
+        } catch (CampoObrigatorioException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    "Campo obrigatório", JOptionPane.ERROR_MESSAGE);
+        } catch (FormatoInvalidoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    "Formato inválido", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                    "Erro ao cadastrar exame: " + e.getMessage(), 
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-        
-        String dataExame = txfDataExame.getText().trim();
-        if (dataExame.contains("_") || dataExame.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, informe a data do exame corretamente.", 
-                    "Campo obrigatório", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        Paciente pacienteSelecionado = (Paciente) cmbPaciente.getSelectedItem();
-        if (pacienteSelecionado == null) {
-            JOptionPane.showMessageDialog(this, "Por favor, selecione um paciente.", 
-                    "Campo obrigatório", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        Exame e = new Exame();
-        e.setId(0L);
-        e.setDescricao(txfDescricao.getText());
-        e.setDataExame(dataExame);
-        e.setPaciente(pacienteSelecionado);
-        
-        exameService.adicionarExame(e);
-        
-        JOptionPane.showMessageDialog(this, "Exame cadastrado com sucesso");
-        
-        main.loadTableExame();
-        
-        fecharTela();
     }
     
     private void limparCampos() {
@@ -196,7 +191,7 @@ public class TelaCadastrarExame extends JDialog {
     private void fecharTela() {
         setVisible(false);
         SwingUtilities.invokeLater(() -> {
-            hide();
+            hide(); 
         });
     }    
    

@@ -8,9 +8,6 @@ import model.Exame;
 
 public class TabelaExameModel extends AbstractTableModel {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     private List<Exame> exames;
     private String[] colunas = {"ID", "Descrição", "Data do Exame", "CPF do Paciente"};

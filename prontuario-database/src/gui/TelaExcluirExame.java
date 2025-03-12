@@ -9,6 +9,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import exception.CampoObrigatorioException;
+import exception.ExameNaoEncontradoException;
+import exception.FormatoInvalidoException;
 import model.Exame;
 import service.ExameService;
 
@@ -100,67 +103,89 @@ public class TelaExcluirExame extends JDialog {
     }
     
     private void buscarExame() {
-        String idPesquisa = txfPesquisaId.getText().trim();
-        if (idPesquisa.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o ID do exame para busca", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         try {
-            Long id = Long.parseLong(idPesquisa);
-            exameAtual = exameService.localizarExamePorId(id);
-            
-            if (exameAtual != null) {
+            String idPesquisa = txfPesquisaId.getText().trim();
+            if (idPesquisa.isEmpty()) {
+                throw new CampoObrigatorioException("ID do exame");
+            }
+
+            try {
+                Long id = Long.parseLong(idPesquisa);
+                exameAtual = exameService.localizarExamePorId(id);
+                
                 txfDescricao.setText(exameAtual.getDescricao());
                 txfData.setText(exameAtual.getDataExame());
                 
                 if (exameAtual.getPaciente() != null) {
                     txfPaciente.setText(exameAtual.getPaciente().getNome() + 
-                                      " (CPF: " + exameAtual.getPaciente().getCpf() + ")");
+                                    " (CPF: " + exameAtual.getPaciente().getCpf() + ")");
                 } else {
                     txfPaciente.setText("Sem paciente associado");
                 }
                 
                 btnDeletar.setEnabled(true);
-            } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Exame não encontrado com o ID informado", 
-                    "Aviso", 
-                    JOptionPane.WARNING_MESSAGE);
-                limparCampos();
+            } catch (NumberFormatException e) {
+                throw new FormatoInvalidoException("ID do exame", "número inteiro");
             }
-        } catch (NumberFormatException e) {
+        } catch (CampoObrigatorioException e) {
             JOptionPane.showMessageDialog(this, 
-                "Por favor, informe um ID válido (número inteiro)", 
+                e.getMessage(), 
+                "Campo obrigatório", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (FormatoInvalidoException e) {
+            JOptionPane.showMessageDialog(this, 
+                e.getMessage(), 
+                "Formato inválido", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (ExameNaoEncontradoException e) {
+            JOptionPane.showMessageDialog(this, 
+                e.getMessage(), 
+                "Exame não encontrado", 
+                JOptionPane.WARNING_MESSAGE);
+            limparCampos();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Erro ao buscar exame: " + e.getMessage(), 
                 "Erro", 
                 JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
     
     private void excluir() {
-        if (exameAtual == null) {
+        try {
+            if (exameAtual == null) {
+                JOptionPane.showMessageDialog(this, 
+                    "Primeiro busque um exame para excluir", 
+                    "Erro", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int confirmacao = JOptionPane.showConfirmDialog(this,
+                "Tem certeza que deseja excluir este exame?\n" +
+                "Descrição: " + exameAtual.getDescricao() + "\n" +
+                "Data: " + exameAtual.getDataExame(),
+                "Confirmar exclusão",
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirmacao == JOptionPane.YES_OPTION) {
+                exameService.deletarExame(exameAtual);
+                JOptionPane.showMessageDialog(this, "Exame excluído com sucesso!");
+                main.loadTableExame();
+                fecharTela();
+            }
+        } catch (ExameNaoEncontradoException e) {
             JOptionPane.showMessageDialog(this, 
-                "Primeiro busque um exame para excluir", 
+                e.getMessage(), 
+                "Exame não encontrado", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Erro ao excluir exame: " + e.getMessage(), 
                 "Erro", 
                 JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        int confirmacao = JOptionPane.showConfirmDialog(this,
-            "Tem certeza que deseja excluir este exame?\n" +
-            "Descrição: " + exameAtual.getDescricao() + "\n" +
-            "Data: " + exameAtual.getDataExame(),
-            "Confirmar exclusão",
-            JOptionPane.YES_NO_OPTION);
-
-        if (confirmacao == JOptionPane.YES_OPTION) {
-            exameService.deletarExame(exameAtual);
-            JOptionPane.showMessageDialog(this, "Exame excluído com sucesso!");
-            main.loadTableExame();
-            fecharTela();
+            e.printStackTrace();
         }
     }
     
@@ -173,6 +198,6 @@ public class TelaExcluirExame extends JDialog {
     }
     
     private void fecharTela() {
-        this.hide();
+        this.hide(); 
     }
 }

@@ -54,7 +54,6 @@ public class TelaPrincipal extends JFrame{
         
         barraMenu = new JMenuBar();
         
-        // Menu Paciente é aqui
         menuPaciente = new JMenu("Paciente");
         barraMenu.add(menuPaciente);
         //--------
@@ -63,13 +62,12 @@ public class TelaPrincipal extends JFrame{
         menuItemExcluirPaciente = new JMenuItem("Excluir");
         menuItemAdicionarPaciente.addActionListener(e -> new TelaCadastrarPaciente(pacService, this));
         menuItemAtualizarPaciente.addActionListener(e -> new TelaAtualizarPaciente(pacService, this));
-        menuItemExcluirPaciente.addActionListener(e -> new TelaExcluirPaciente(pacService, this));
+        menuItemExcluirPaciente.addActionListener(e -> new TelaExcluirPaciente(pacService, exameService, this));
         
         menuPaciente.add(menuItemAdicionarPaciente);
         menuPaciente.add(menuItemAtualizarPaciente);
         menuPaciente.add(menuItemExcluirPaciente);
         
-        // Menu Exame é aqui
         menuExame = new JMenu("Exame");
         barraMenu.add(menuExame);
         //--------
@@ -86,7 +84,6 @@ public class TelaPrincipal extends JFrame{
         
         add(barraMenu, BorderLayout.NORTH);
         
-        // Ações padrão
         //-------------------------------------
         
         tablePacientes = new JTable();

@@ -9,6 +9,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import exception.CampoObrigatorioException;
+import exception.EntidadeDuplicadaException;
+import exception.FormatoInvalidoException;
+import exception.PacienteNaoEncontradoException;
 import model.Paciente;
 import service.PacienteService;
 
@@ -99,57 +103,85 @@ public class TelaAtualizarPaciente extends JDialog {
 	}
 	
 	private void buscarPaciente() {
-		String cpfPesquisa = txfPesquisaCpf.getText().trim();
-        if (cpfPesquisa.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o CPF para busca", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        pacienteAtual = pacService.findByCpf(cpfPesquisa);
-        if (pacienteAtual != null) {
-            txfCpf.setText(pacienteAtual.getCpf());
-        	txfNome.setText(pacienteAtual.getNome());
-            btnSalvar.setEnabled(true);
-        } else {
-            JOptionPane.showMessageDialog(this, 
-                "Paciente não encontrado com o CPF informado", 
-                "Aviso", 
-                JOptionPane.WARNING_MESSAGE);
-            limparCampos();
-        }
+		try {
+			String cpfPesquisa = txfPesquisaCpf.getText().trim();
+			
+			Paciente pacienteEncontrado = pacService.findByCpf(cpfPesquisa);
+			
+			if (pacienteEncontrado != null) {
+				pacienteAtual = pacienteEncontrado;
+				txfCpf.setText(pacienteAtual.getCpf());
+				txfNome.setText(pacienteAtual.getNome());
+				btnSalvar.setEnabled(true);
+			} else {
+				JOptionPane.showMessageDialog(this, 
+					"Paciente não encontrado com o CPF informado", 
+					"Aviso", 
+					JOptionPane.WARNING_MESSAGE);
+				limparCampos();
+			}
+		} catch (CampoObrigatorioException e) {
+			JOptionPane.showMessageDialog(this, 
+				e.getMessage(), 
+				"Campo obrigatório", 
+				JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, 
+				"Erro ao buscar paciente: " + e.getMessage(), 
+				"Erro", 
+				JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
     }
 	
 	private void salvarAlteracoes() {
-        if (pacienteAtual == null) {
-            JOptionPane.showMessageDialog(this, 
-                "Primeiro busque um paciente para atualizar", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+		try {
+			if (pacienteAtual == null) {
+				JOptionPane.showMessageDialog(this, 
+					"Primeiro busque um paciente para atualizar", 
+					"Erro", 
+					JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 
-        String novoCpf = txfCpf.getText().trim();
-        String novoNome = txfNome.getText().trim();
-        
-        if (novoCpf.isEmpty() || novoNome.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Cpf e nome não podem estar vazios", 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        pacienteAtual.setCpf(novoCpf);
-        pacienteAtual.setNome(novoNome);
-        
-        pacService.atualizarPaciente(pacienteAtual);
-        main.atualizarTabelaPacientes();
-        main.atualizarTabelaExames();
-        fecharTela();
-        
+			String novoCpf = txfCpf.getText().trim();
+			String novoNome = txfNome.getText().trim();
+			
+			pacienteAtual.setCpf(novoCpf);
+			pacienteAtual.setNome(novoNome);
+			
+			pacService.atualizarPaciente(pacienteAtual);
+			JOptionPane.showMessageDialog(this, "Paciente atualizado com sucesso!");
+			main.atualizarTabelaPacientes();
+			main.atualizarTabelaExames();
+			fecharTela();
+		} catch (CampoObrigatorioException e) {
+			JOptionPane.showMessageDialog(this, 
+				e.getMessage(), 
+				"Campo obrigatório", 
+				JOptionPane.ERROR_MESSAGE);
+		} catch (FormatoInvalidoException e) {
+			JOptionPane.showMessageDialog(this, 
+				e.getMessage(), 
+				"Formato inválido", 
+				JOptionPane.ERROR_MESSAGE);
+		} catch (PacienteNaoEncontradoException e) {
+			JOptionPane.showMessageDialog(this, 
+				e.getMessage(), 
+				"Paciente não encontrado", 
+				JOptionPane.ERROR_MESSAGE);
+		} catch (EntidadeDuplicadaException e) {
+			JOptionPane.showMessageDialog(this, 
+				e.getMessage(), 
+				"CPF duplicado", 
+				JOptionPane.WARNING_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, 
+				"Erro ao atualizar paciente: " + e.getMessage(), 
+				"Erro", 
+				JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
 	}
 	
 	private void limparCampos() {
@@ -163,5 +195,4 @@ public class TelaAtualizarPaciente extends JDialog {
 	private void fecharTela() {
 		this.hide();
 	}
-
 }

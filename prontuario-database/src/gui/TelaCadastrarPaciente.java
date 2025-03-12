@@ -10,6 +10,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import exception.CampoObrigatorioException;
+import exception.EntidadeDuplicadaException;
+import exception.FormatoInvalidoException;
 import model.Paciente;
 import service.PacienteService;
 
@@ -90,24 +93,38 @@ public class TelaCadastrarPaciente extends JDialog{
     }
     
     private void addPaciente() {
-        Paciente p = new Paciente(0L, txfCpf.getText(), txfNome.getText());
-        pacService.adicionarPaciente(p);
-        JOptionPane.showMessageDialog(null, "Paciente cadastrado com sucesso");
-        txfCpf.setText("");
-        txfNome.setText("");
-        main.loadTablePaciente();
-        fecharTela();
+        try {
+            Paciente p = new Paciente(0L, txfCpf.getText(), txfNome.getText());
+            pacService.adicionarPaciente(p);
+            JOptionPane.showMessageDialog(this, "Paciente cadastrado com sucesso");
+            txfCpf.setText("");
+            txfNome.setText("");
+            main.loadTablePaciente();
+            fecharTela();
+        } catch (CampoObrigatorioException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    "Campo obrigatório", JOptionPane.ERROR_MESSAGE);
+        } catch (FormatoInvalidoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    "Formato inválido", JOptionPane.ERROR_MESSAGE);
+        } catch (EntidadeDuplicadaException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
+                    "Registro duplicado", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                    "Erro ao cadastrar paciente: " + e.getMessage(), 
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
     
     private void limparCampos() {
         txfCpf.setText("");
         txfNome.setText("");
         txfCpf.setEnabled(true);
-        btnSalvar.setEnabled(false);
     }
     
     private void fecharTela() {
-        this.hide();
+        this.hide(); 
     }
-    
 }
