@@ -7,16 +7,23 @@ public class Exame {
 	private Long id;
 	private String descricao;
 	private String dataExame;
+	private Paciente paciente;
 	
-	public Exame(Long id, String descricao, String dataExame) {
-		this.id = id;
-		this.descricao = descricao;
-		this.dataExame = dataExame;
-	}
+    public Exame(Long id, String descricao, String dataExame) {
+        this.id = id;
+        this.descricao = descricao;
+        this.dataExame = dataExame;
+    }
 
-	public Exame() {
-		
-	}
+    public Exame(Long id, String descricao, String dataExame, Paciente paciente) {
+        this.id = id;
+        this.descricao = descricao;
+        this.dataExame = dataExame;
+        this.paciente = paciente;
+    }
+
+    public Exame() {
+    }
 
 	public Long getId() {
 		return id;
@@ -41,6 +48,14 @@ public class Exame {
 	public void setDataExame(String dataExame) {
 		this.dataExame = dataExame;
 	}
+	
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
+    }
 
 	@Override
 	public int hashCode() {
@@ -59,14 +74,10 @@ public class Exame {
 		return Objects.equals(id, other.id);
 	}
 
-	@Override
-	public String toString() {
-		return "Exame [id=" + id + ", descricao=" + descricao + ", dataExame=" + dataExame + "]";
-	}
-	
-	
-	
-	
-	
-	
+    @Override
+    public String toString() {
+        return "Exame [id=" + id + ", descricao=" + descricao + ", dataExame=" + dataExame + 
+               ", paciente=" + (paciente != null ? paciente.getNome() : "nenhum") + "]";
+    }
+
 }

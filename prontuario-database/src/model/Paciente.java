@@ -75,9 +75,4 @@ public class Paciente {
 	public String toString() {
 		return "Paciente [id=" + id + ", cpf=" + cpf + ", nome=" + nome + ", exames=" + exames + "]";
 	}
-	
-	
-	
-	
-	
 }

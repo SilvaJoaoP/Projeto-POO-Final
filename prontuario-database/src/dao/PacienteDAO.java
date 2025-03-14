@@ -19,8 +19,6 @@ public class PacienteDAO implements GenericDAO<Paciente, Long>{
 	
 	@Override
 	public void add(Paciente obj) {
-		// TODO Auto-generated method stub
-		
 		try(PreparedStatement pstm = db.getConnection()
 				.prepareStatement("INSERT INTO PACIENTES VALUES (?,?,?)")){
 			pstm.setLong(1, 0);
@@ -28,7 +26,6 @@ public class PacienteDAO implements GenericDAO<Paciente, Long>{
 			pstm.setString(3, obj.getNome());
 			pstm.execute();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -90,7 +87,6 @@ public class PacienteDAO implements GenericDAO<Paciente, Long>{
 			}
 			return temp;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

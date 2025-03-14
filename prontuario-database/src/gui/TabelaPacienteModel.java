@@ -8,9 +8,6 @@ import model.Paciente;
 
 public class TabelaPacienteModel extends AbstractTableModel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private List<Paciente> pacientes;
 	private String[] colunas = {"ID", "CPF", "Nome"};
@@ -21,13 +18,11 @@ public class TabelaPacienteModel extends AbstractTableModel{
 	
 	@Override
 	public int getRowCount() {
-		// TODO Auto-generated method stub
 		return pacientes.size();
 	}
 
 	@Override
 	public int getColumnCount() {
-		// TODO Auto-generated method stub
 		return colunas.length;
 	}
 	
@@ -38,7 +33,6 @@ public class TabelaPacienteModel extends AbstractTableModel{
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
 		Paciente p = pacientes.get(rowIndex);
 		return switch(columnIndex) {
 		case 0 -> p.getId();
